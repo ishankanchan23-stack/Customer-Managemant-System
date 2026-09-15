@@ -99,14 +99,14 @@ it produces output like this:
 ```
 === Customer Management System - Stage 1 ===
 
-Customer ID   : 1001
+Customer ID   : 1777
 Name          : Ishan Kanchan
-Phone         : 9876543210
-Email         : ishan@example.com
-Address       : Alandi, Pune
+Phone         : 8149755471
+Email         : ishankanchan23@gmail.com
+Address       : Uruli kanchan, Pune
 Registered On : 15-09-2026
 
-Customer ID   : 0
+Customer ID   : 1772
 Name          : Rahul Deshmukh
 Phone         : 9123456780
 Email         : rahul@example.com
