@@ -1,0 +1,12 @@
+# Build output
+*.o
+cms
+*.exe
+
+# Local customer data
+data/*.txt
+
+# Editor / OS noise
+.vscode/
+.idea/
+.DS_Store
