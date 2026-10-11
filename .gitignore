@@ -1,0 +1,19 @@
+# Build output
+*.o
+cms
+*.exe
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Local database files
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Editor / OS noise
+.vscode/
+.idea/
+.DS_Store

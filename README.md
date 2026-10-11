@@ -1,149 +1,106 @@
-# Customer Management System (C++)
+# Customer Management System
 
-A console-based Customer Management System written in modern C++, built as a
-learning project to practice OOP fundamentals, file handling, and clean
-project structure. It's being developed in stages, with each stage adding a
-working, compilable piece of the system rather than one large dump of code.
+A customer management dashboard backed by a persistent SQLite database, built
+around the original C++17 customer model. The web application uses plain HTML,
+CSS, and JavaScript, with a small Python standard-library server for its HTTP
+API and database. No package installation, frontend framework, or external
+database server is required.
 
-This README reflects the current stage of development and will be updated
-as new features are added.
+## Project structure
 
-## Current Status: Stage 1 — Data Model
-
-Right now the project implements the core data model and proves it works.
-The menu-driven interface, file storage, and CRUD operations described in
-the project plan are not built yet — see [Future Improvements](#future-improvements)
-for what's coming next.
-
-## Features (implemented so far)
-
-- `Date` struct representing a calendar date (day, month, year)
-- Automatic capture of the current system date via `Date::today()`
-- `Customer` class storing ID, name, phone, email, address, and registration date
-- Two ways to build a customer: a parameterised constructor, or the default
-  constructor followed by setters
-- Encapsulated fields — all data members are private, accessed only through
-  getters and setters
-- No `setId()` by design — a customer's ID is fixed at creation and cannot
-  be changed afterwards
-- `toDisplayString()` — formats a customer's details as readable text
-- A `main.cpp` driver that creates sample customers, prints them, and shows
-  a setter updating a field
-
-## Technologies Used
-
-- **Language:** C++ (C++17)
-- **Compiler:** g++
-- **Build tool:** GNU Make
-- **Standard library only** — no external/third-party libraries
-
-## C++ Concepts Demonstrated
-
-- Classes vs. structs, and choosing deliberately between them (`Customer`
-  needs encapsulation and validation later; `Date` is plain data with
-  nothing to protect)
-- Encapsulation — private data members with public getters/setters
-- Constructors — both default and parameterised, plus constructor
-  initializer lists
-- `const` member functions to guarantee getters can't modify state
-- `std::string` handling
-- String formatting with `<sstream>` and `<iomanip>`
-- Working with system time via `<ctime>`
-- Passing objects by `const reference` to avoid unnecessary copying
-
-## Project Structure
-
-```
-customer-management-system/
-├── include/
-│   └── Customer.h        # Date struct + Customer class declarations
-├── src/
-│   ├── Customer.cpp      # Date + Customer implementation
-│   └── main.cpp          # Stage 1 driver / demonstration
-├── data/                 # Reserved for customer data file (not used yet)
-├── Makefile
-├── .gitignore
-└── README.md
+```text
+.
+├── Customer.h              # Original C++ Date and Customer declarations
+├── Customer.cpp            # Original C++ data model implementation
+├── main.cpp                # Original C++ console demonstration
+├── server.py               # HTTP server, customer API, SQLite storage
+├── web/
+│   ├── index.html          # Dashboard and accessible dialogs
+│   ├── styles.css          # Responsive light/dark dashboard styles
+│   └── app.js              # Dashboard, customer management, and API client
+├── tests/
+│   └── test_server.py      # HTTP API and persistence integration tests
+├── data/                   # Created automatically; SQLite database lives here
+├── Makefile                # C++ build plus optional web/test targets
+└── .gitignore
 ```
 
-## How to Compile and Run
+The repository started as a Stage 1 C++17 data-model demonstration, not as an
+existing web application. Its original customer model and console demonstration
+are preserved. The Python server is the web application's backend: Python's
+standard library provides HTTP and SQLite support without adding a framework,
+database driver, or build step. The browser UI uses no third-party packages.
 
-This project uses a Makefile, so building it is a single command.
+## Run the web application
 
-```bash
-# Build the project
-make
+Requirements: Python 3.10 or newer. On Windows, install Python with the Python
+Launcher (`py`) available on your PATH.
 
-# Run it
-./cms
+From the project directory in PowerShell:
 
-# Or build and run in one step
-make run
-
-# Remove build artifacts
-make clean
+```powershell
+py -3 server.py
 ```
 
-If `make` isn't available on your system, you can compile directly:
+Open **http://127.0.0.1:8000** in your browser. The page and API are served
+together by the same process; there is no separate frontend build or server.
+Press **Ctrl+C** in the terminal to stop the server.
 
-```bash
-g++ -std=c++17 -Iinclude src/*.cpp -o cms
-./cms
+The SQLite database is created automatically at `data/customers.db`. Customer
+records and activity history remain there after the server is restarted. To
+choose a different database path:
+
+```powershell
+$env:CMS_DATABASE_PATH = "C:\data\customers.db"
+py -3 server.py
 ```
 
-## Example Output
+The server binds to `127.0.0.1` by default and is intended for a single-user,
+local workspace. Authentication and role management are not implemented: do
+not expose this development server to a network or the public internet. The
+database itself stays on the server and is not served as a static file.
 
-The current `main.cpp` is a demonstration, not an interactive menu. Running
-it produces output like this:
+## Features
 
+- Overview dashboard with total, active, inactive, and engagement statistics.
+- Six-month customer registration chart and recent customer/activity summaries.
+- Customer profiles with create, read, update, and confirmed delete operations.
+- Case-insensitive search by customer ID, name, email, phone, or city.
+- City and status filters, sortable columns, and server-side pagination.
+- Customer CSV import with row validation and all-or-nothing database changes;
+  CSV export respects the current search and filters.
+- Activity history for customer creation, editing, removal, and CSV imports.
+- Responsive layout, accessible dialogs and forms, toast messages, and saved
+  light/dark theme preference.
+- Backend validation, parameterized SQL queries, unique case-insensitive email
+  addresses, request-size limits, and clear API error responses.
+- Useful empty states; no placeholder customer records are inserted.
+
+Required customer fields are full name, email, phone number, and city. Address
+is optional. IDs are assigned by SQLite. Status is active or inactive, and
+registration date defaults to the current date.
+
+## Tests
+
+Run the backend integration tests from the project directory:
+
+```powershell
+py -3 -m unittest discover -s tests -v
 ```
-=== Customer Management System - Stage 1 ===
 
-Customer ID   : 1777
-Name          : Ishan Kanchan
-Phone         : 8149755471
-Email         : ishankanchan23@gmail.com
-Address       : Uruli kanchan, Pune
-Registered On : 15-09-2026
+The tests cover customer CRUD, validation, duplicate emails, search and filters,
+sorting and pagination, statistics, city lookup, CSV import/export, rollback of
+invalid imports, HTTP routes, request limits, and persistence across a server
+restart. All test data is written to temporary databases.
 
-Customer ID   : 1772
-Name          : Rahul Deshmukh
-Phone         : 9123456780
-Email         : rahul@example.com
-Address       : Kothrud, Pune
-Registered On : 01-01-2000
+## Original C++ demonstration
 
-After updating the address of customer 1001:
-Chakan, Pune
+The C++17 model and console sample remain available. With a compatible g++:
+
+```powershell
+g++ -std=c++17 -Wall -Wextra Customer.cpp main.cpp -o cms.exe
+.\cms.exe
 ```
 
-The second customer shows placeholder values (`ID 0`, `01-01-2000`) because
-it's built with the default constructor with no ID assigned yet. Automatic,
-non-repeating ID generation is handled by the manager class in a later stage.
-
-## Data Storage
-
-Not implemented yet. The plan is a plain text file (`data/customers.txt`)
-with one pipe-delimited (`|`) record per line, read and written through a
-dedicated `FileHandler` class using `ifstream`/`ofstream`. The `data/`
-folder already exists in the repo in preparation for this.
-
-## Future Improvements
-
-Planned for upcoming stages, in rough order:
-
-- `CustomerManager` class to hold customers in a `std::vector` and generate
-  unique, non-reused customer IDs
-- Menu-driven console interface (`ConsoleUI`)
-- File persistence, so records survive after the program closes
-- Search by ID, name, and phone
-- Update and delete operations, with confirmation before deleting
-- Input validation (`Validator` class) with meaningful error messages
-- Sorting customers by ID, name, or registration date
-- Basic exception handling for invalid input and corrupt data files
-- A simple record-count / summary view
-
-## Author
-
-**Ishan Sandeep Kanchan**
-S.Y. B.Tech. Software Engineering, MIT Academy of Engineering, Alandi, Pune
+If GNU Make is installed, the Makefile also provides `make`, `make run`,
+`make web`, and `make test` targets.

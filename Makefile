@@ -1,8 +1,8 @@
 CXX      = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude
+CXXFLAGS = -std=c++17 -Wall -Wextra -I.
 TARGET   = cms
 
-SRC = $(wildcard src/*.cpp)
+SRC = main.cpp Customer.cpp
 OBJ = $(SRC:.cpp=.o)
 
 all: $(TARGET)
@@ -10,13 +10,19 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-src/%.o: src/%.cpp
+%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 run: $(TARGET)
 	./$(TARGET)
 
+web:
+	python server.py
+
+test:
+	python -m unittest discover -s tests -v
+
 clean:
 	rm -f $(OBJ) $(TARGET)
 
-.PHONY: all run clean
+.PHONY: all run web test clean
